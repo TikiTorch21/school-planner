@@ -1,0 +1,9 @@
+[project]
+name = "study-planner"
+version = "0.1.0"
+description = "A simple natural-language school planner."
+requires-python = ">=3.11"
+dependencies = [
+    "dateparser>=1.2.0",
+    "streamlit>=1.35.0",
+]

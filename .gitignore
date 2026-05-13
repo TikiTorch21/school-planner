@@ -1,0 +1,15 @@
+# Python junk
+__pycache__/
+*.pyc
+.DS_Store
+
+# Environments (uv)
+.venv/
+.python-version
+
+# Personal Data & Secrets
+.env
+events.json
+
+# Streamlit local config
+.streamlit/config.toml
