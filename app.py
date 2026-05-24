@@ -7,7 +7,7 @@ from html import escape
 
 import streamlit as st
 
-from planner import Event, add_event, load_events, save_events
+from planner import Event, add_event, load_events, save_events, purge_expired_events
 
 
 APP_THEME_CSS = """
@@ -631,6 +631,8 @@ def main() -> None:
     if "error_message" in st.session_state:
         st.error(st.session_state.pop("error_message"))
 
+    events = load_events()
+    purge_expired_events()
     events = load_events()
 
     st.subheader("Calendar")

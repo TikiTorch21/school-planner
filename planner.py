@@ -55,6 +55,16 @@ def save_events(events: list[Event]) -> None:
 
     temporary_file.replace(EVENTS_FILE)
 
+def purge_expired_events() -> int:
+    """Remove events older than today. Returns count of removed events."""
+    events = load_events()
+    today = date.today().isoformat()
+    current_events = [e for e in events if e.date >= today]
+    removed = len(events) - len(current_events)
+    if removed:
+        save_events(current_events)
+    return removed
+
 
 def parse_event(raw_text: str) -> Event:
     """Parse a natural-language event into a structured Event."""
@@ -92,6 +102,7 @@ def parse_event(raw_text: str) -> Event:
 def add_event(raw_text: str) -> Event:
     """Parse a natural-language event, save it, and return the new event."""
     event = parse_event(raw_text)
+    purge_expired_events()
     events = load_events()
     events.append(event)
     save_events(events)
