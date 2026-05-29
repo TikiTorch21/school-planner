@@ -27,18 +27,31 @@ APP_THEME_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --ink: #f8fbff;
-    --muted: #a8b3cf;
-    --panel: rgba(10, 15, 32, 0.82);
-    --panel-strong: rgba(14, 21, 43, 0.94);
-    --line: rgba(140, 160, 255, 0.22);
-    --cyan: #35f6ff;
-    --pink: #ff4fd8;
-    --lime: #69ff97;
-    --yellow: #ffe66d;
-    --red: #ff5d73;
-    --blue: #4aa8ff;
-    --purple: #a879ff;
+    /* WARM MATTE PALETTE (Espresso / Cozy) */
+    --warm0: #2a2725; /* Main background - Deep Warm Brown */
+    --warm1: #36322f; /* Lighter background / Panels */
+    --warm2: #45403c; /* Hover states / Selections */
+    --warm3: #58524d; /* Borders / Line dividers */
+    
+    --warm4: #a8a198; /* Sub-text / Muted text */
+    --warm5: #dcd5c9; /* Standard text */
+    --warm6: #f4ece0; /* Bright text / Headings - Cream */
+    
+    /* Warm Accents */
+    --warm-accent: #c98a6c; /* Primary Focus / Copper */
+    
+    /* Category Colors */
+    --warm-ex: #c67a73; /* Muted Terracotta (Exams) */
+    --warm-gn: #d4a76a; /* Mustard (General) */
+    --warm-cl: #9ba87d; /* Olive/Sage (Clubs) */
+    --warm-pr: #b394a4; /* Dusty Mauve (Projects) */
+    --warm-hw: #82939f; /* Muted Slate (Homework) */
+
+    --panel: var(--warm1);
+    --panel-strong: var(--warm2);
+    --line: var(--warm3);
+    --ink: var(--warm6);
+    --muted: var(--warm4);
 }
 
 html, body, [class*="css"] {
@@ -46,55 +59,48 @@ html, body, [class*="css"] {
 }
 
 .stApp {
-    background:
-        radial-gradient(circle at 12% 8%, rgba(53, 246, 255, 0.22), transparent 32%),
-        radial-gradient(circle at 88% 14%, rgba(255, 79, 216, 0.2), transparent 28%),
-        linear-gradient(135deg, #070912 0%, #111735 48%, #07111d 100%);
+    background: var(--warm0);
     color: var(--ink);
 }
 
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, rgba(8, 12, 28, 0.96), rgba(13, 24, 46, 0.94));
+    background: var(--warm1);
     border-right: 1px solid var(--line);
     padding-top: 2rem;
 }
 
 .block-container {
     max-width: 1480px;
-    padding: 1.75rem 2.25rem 3rem;
+    padding: 1.5rem 2rem 2rem;
 }
 
 .planner-hero {
     border: 1px solid var(--line);
-    border-radius: 18px;
-    background:
-        linear-gradient(135deg, rgba(53, 246, 255, 0.12), rgba(255, 79, 216, 0.1)),
-        rgba(8, 12, 28, 0.72);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+    border-radius: 12px;
+    background: var(--panel);
     margin-bottom: 0.5rem;
-    padding: 1.35rem 1.5rem;
+    padding: 1.2rem;
     text-align: center;
 }
 
 .hero-emoji {
-    font-size: 3.6rem;
+    font-size: 2.8rem;
     line-height: 1;
-    margin-bottom: 0.35rem;
-    text-shadow: 0 0 26px rgba(53, 246, 255, 0.65);
+    margin-bottom: 0.2rem;
 }
 
 .planner-hero h1 {
     color: var(--ink);
-    font-size: clamp(2rem, 4vw, 3.6rem);
-    font-weight: 800;
-    letter-spacing: 0;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
     margin: 0;
 }
 
 .planner-hero p {
     color: var(--muted);
-    font-size: 1rem;
-    margin: 0.55rem auto 0;
+    font-size: 0.95rem;
+    margin: 0.5rem auto 0;
     max-width: 720px;
 }
 
@@ -104,10 +110,10 @@ h1, h2, h3, h4, label, p, span, div {
 
 h2, h3 {
     color: var(--ink);
+    font-weight: 600;
 }
 
 /* --- THE GIANT "SEARCH ENGINE" INPUT --- */
-/* Target ONLY the main search bar so we don't break manual forms */
 div[data-testid="stTextInput"]:has(input[aria-label="Add a school event"]) {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
@@ -118,45 +124,44 @@ div[data-testid="stTextInput"]:has(input[aria-label="Add a school event"]) label
 }
 
 input[aria-label="Add a school event"] {
-    background: rgba(10, 15, 32, 0.95);
-    border: 2px solid rgba(53, 246, 255, 0.4);
-    border-radius: 24px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(53, 246, 255, 0.1);
+    background: var(--warm1);
+    border: 2px solid var(--warm3);
+    border-radius: 12px;
     color: var(--ink);
-    font-size: 1.4rem;
-    line-height: 1.6;
-    padding: 1.2rem 1.5rem;
-    min-height: 5rem;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    padding: 1rem 1.2rem;
+    min-height: 4.5rem;
     text-align: center;
-    transition: all 250ms ease;
+    transition: all 150ms ease;
+    box-shadow: none; /* Flat design */
 }
 
 input[aria-label="Add a school event"]:focus {
-    border-color: var(--pink);
-    box-shadow: 0 0 0 4px rgba(255, 79, 216, 0.15), 0 0 40px rgba(255, 79, 216, 0.35);
-    transform: translateY(-2px) scale(1.01);
+    border-color: var(--warm-accent);
+    background: var(--warm2);
+    outline: none;
 }
 
 input[aria-label="Add a school event"]::placeholder {
-    color: rgba(168, 179, 207, 0.5);
+    color: var(--warm3);
     font-weight: 400;
 }
 /* --------------------------------------- */
 
 .stButton > button {
-    background: linear-gradient(135deg, rgba(53, 246, 255, 0.18), rgba(255, 79, 216, 0.16));
-    border: 1px solid rgba(53, 246, 255, 0.42);
-    border-radius: 12px;
-    color: var(--ink);
-    font-weight: 800;
-    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    background: var(--warm1);
+    border: 1px solid var(--warm3);
+    border-radius: 8px;
+    color: var(--warm5);
+    font-weight: 500;
+    transition: all 150ms ease;
 }
 
 .stButton > button:hover {
-    border-color: var(--pink);
-    box-shadow: 0 0 24px rgba(255, 79, 216, 0.24);
-    color: var(--ink);
-    transform: scale(1.035);
+    border-color: var(--warm-accent);
+    background: var(--warm2);
+    color: var(--warm6);
 }
 
 [data-testid="stMetric"],
@@ -164,58 +169,54 @@ input[aria-label="Add a school event"]::placeholder {
 details {
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+    border-radius: 12px;
 }
 
-/* Dashboard Metric Tweaks */
 [data-testid="stMetric"] {
-    padding: 1rem 1.5rem;
+    padding: 0.85rem 1rem;
     text-align: center;
-    border-color: rgba(53, 246, 255, 0.2);
 }
 
 details {
     margin-bottom: 0.65rem;
     overflow: hidden;
-    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    transition: all 150ms ease;
 }
 
 details:hover {
-    border-color: rgba(53, 246, 255, 0.45);
-    box-shadow: 0 18px 52px rgba(53, 246, 255, 0.12);
-    transform: translateY(-2px) scale(1.006);
+    border-color: var(--warm-accent);
+    background: var(--panel-strong);
 }
 
 details summary {
-    color: var(--ink);
-    font-weight: 700;
+    color: var(--warm5);
+    font-weight: 600;
 }
 
 .calendar-title {
     color: var(--ink);
-    margin: 1.5rem 0 0.85rem;
+    margin: 0.8rem 0 0.4rem;
     text-align: center;
-    text-shadow: 0 0 18px rgba(53, 246, 255, 0.34);
+    font-size: 1.6rem;
 }
 
 .calendar-shell {
     width: 100%;
-    margin: 0.5rem 0 2rem;
+    margin: 0.25rem 0 1.5rem;
     overflow: visible;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 0.7rem;
+    gap: 0.35rem;
     overflow: visible;
 }
 
 .calendar-weekday {
-    color: var(--cyan);
-    font-size: 0.84rem;
-    font-weight: 800;
+    color: var(--warm4);
+    font-size: 0.8rem;
+    font-weight: 600;
     text-align: center;
     text-transform: uppercase;
 }
@@ -223,95 +224,89 @@ details summary {
 .calendar-day {
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: 0 18px 52px rgba(0, 0, 0, 0.24);
-    min-height: clamp(150px, 16vh, 220px);
-    padding: 0.65rem;
+    border-radius: 10px;
+    /* REDUCED HEIGHT VERY SLIGHTLY */
+    min-height: clamp(100px, 11vh, 150px); 
+    padding: 0.5rem;
     overflow: visible;
     position: relative;
 }
 
 .calendar-day.today {
-    background: linear-gradient(135deg, rgba(53, 246, 255, 0.16), rgba(255, 79, 216, 0.1)), var(--panel-strong);
-    border-color: var(--cyan);
-    box-shadow:
-        inset 0 0 0 3px var(--cyan),
-        0 0 34px rgba(53, 246, 255, 0.3),
-        0 18px 52px rgba(0, 0, 0, 0.28);
+    background: var(--warm2);
+    border-color: var(--warm-accent);
 }
 
 .calendar-day.today .day-number {
     align-items: center;
-    background: linear-gradient(135deg, var(--cyan), var(--pink));
-    border-radius: 999px;
-    color: #06111f;
+    background: var(--warm-accent);
+    border-radius: 6px;
+    color: var(--warm0);
     display: inline-flex;
-    height: 1.85rem;
+    height: 1.6rem;
     justify-content: center;
-    width: 1.85rem;
+    width: 1.6rem;
 }
 
 .calendar-day.muted-day {
-    background: rgba(8, 12, 28, 0.46);
-    color: #66708b;
+    background: rgba(54, 50, 47, 0.4); /* Faded Warm1 */
+    border-color: transparent;
+}
+
+.calendar-day.muted-day .day-number {
+    color: var(--warm3);
 }
 
 .day-number {
-    color: var(--ink);
-    font-size: 0.95rem;
-    font-weight: 800;
+    color: var(--warm5);
+    font-size: 0.9rem;
+    font-weight: 700;
     line-height: 1;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.3rem;
 }
 
-/* SMART WRAPPING PILLS */
+/* MATTE WARM PILLS */
 .calendar-event {
-    background: rgba(74, 168, 255, 0.16);
-    border: 1px solid rgba(74, 168, 255, 0.2);
-    border-left: 4px solid var(--blue);
-    border-radius: 12px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-    color: var(--ink);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--warm5);
     cursor: default;
-    font-size: 0.82rem;
-    line-height: 1.35;
-    margin-top: 0.4rem;
-    padding: 0.45rem 0.55rem;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    margin-top: 0.3rem;
+    padding: 0.3rem 0.4rem;
     position: relative;
-    transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    transition: all 100ms ease;
     z-index: 1;
 }
 
 .calendar-event:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 26px rgba(53, 246, 255, 0.18), 0 16px 40px rgba(0, 0, 0, 0.28);
-    transform: translateY(-2px) scale(1.025);
     z-index: 20;
 }
 
 .event-time {
-    color: var(--muted);
+    color: var(--warm4);
     display: block;
-    font-size: 0.72rem;
-    font-weight: 800;
-    margin-bottom: 0.15rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.1rem;
 }
 
 .event-title {
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Allow up to 2 lines of text */
+    -webkit-line-clamp: 2; 
     -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: normal; /* Allow text wrapping */
+    white-space: normal; 
     word-wrap: break-word;
 }
 
 .event-tooltip {
-    background: #070912;
-    border: 1px solid rgba(53, 246, 255, 0.4);
-    border-radius: 14px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38), 0 0 28px rgba(53, 246, 255, 0.16);
-    color: var(--ink);
+    background: var(--warm1);
+    border: 1px solid var(--warm3);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(42, 39, 37, 0.8);
+    color: var(--warm5);
     font-size: 0.82rem;
     left: 50%;
     line-height: 1.45;
@@ -330,9 +325,9 @@ details summary {
 }
 
 .event-tooltip::before {
-    background: #070912;
-    border-left: 1px solid rgba(53, 246, 255, 0.4);
-    border-top: 1px solid rgba(53, 246, 255, 0.4);
+    background: var(--warm1);
+    border-left: 1px solid var(--warm3);
+    border-top: 1px solid var(--warm3);
     content: "";
     height: 0.65rem;
     left: 50%;
@@ -349,30 +344,55 @@ details summary {
 }
 
 .tooltip-title {
-    color: var(--cyan);
+    color: var(--warm-accent);
     font-size: 0.9rem;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 0.35rem;
 }
 
-.calendar-event.homework { background: rgba(74, 168, 255, 0.18); border-left-color: var(--blue); }
-.calendar-event.exams { background: rgba(255, 93, 115, 0.18); border-left-color: var(--red); }
-.calendar-event.clubs { background: rgba(105, 255, 151, 0.15); border-left-color: var(--lime); }
-.calendar-event.projects { background: rgba(168, 121, 255, 0.18); border-left-color: var(--purple); }
-.calendar-event.general { background: rgba(255, 230, 109, 0.14); border-left-color: var(--yellow); }
+/* Category Warm Matte Variations */
+.calendar-event.homework { 
+    background: rgba(130, 147, 159, 0.15); 
+    border-left: 3px solid var(--warm-hw); 
+}
+.calendar-event.homework:hover { background: rgba(130, 147, 159, 0.25); }
+
+.calendar-event.exams { 
+    background: rgba(198, 122, 115, 0.15); 
+    border-left: 3px solid var(--warm-ex); 
+}
+.calendar-event.exams:hover { background: rgba(198, 122, 115, 0.25); }
+
+.calendar-event.clubs { 
+    background: rgba(155, 168, 125, 0.15); 
+    border-left: 3px solid var(--warm-cl); 
+}
+.calendar-event.clubs:hover { background: rgba(155, 168, 125, 0.25); }
+
+.calendar-event.projects { 
+    background: rgba(179, 148, 164, 0.15); 
+    border-left: 3px solid var(--warm-pr); 
+}
+.calendar-event.projects:hover { background: rgba(179, 148, 164, 0.25); }
+
+.calendar-event.general { 
+    background: rgba(212, 167, 106, 0.15); 
+    border-left: 3px solid var(--warm-gn); 
+}
+.calendar-event.general:hover { background: rgba(212, 167, 106, 0.25); }
 
 .more-events {
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-weight: 800;
-    margin-top: 0.35rem;
+    color: var(--warm4);
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
 }
 
 @media (max-width: 760px) {
     .block-container { padding-left: 0.75rem; padding-right: 0.75rem; }
     .planner-hero { padding: 1rem; }
     .calendar-grid { gap: 0.28rem; }
-    .calendar-day { min-height: 112px; padding: 0.35rem; }
+    .calendar-day { min-height: 90px; padding: 0.25rem; }
     .calendar-event { font-size: 0.7rem; }
     .event-tooltip { min-width: 190px; }
 }
@@ -573,7 +593,7 @@ def render_calendar(events: list[Event]) -> None:
 
             day_events = grouped_events.get(day, [])
 
-            for event in day_events[:5]:
+            for event in day_events[:4]: # Show max 4 events per day in smaller boxes
                 category_class = category_css_class(event.category)
                 event_title = escape(event.title)
                 # Use compact=True to hide "All day" and save vertical space in the pills
@@ -596,7 +616,7 @@ def render_calendar(events: list[Event]) -> None:
                     "</div>"
                 )
 
-            extra_event_count = len(day_events) - 5
+            extra_event_count = len(day_events) - 4
             if extra_event_count > 0:
                 calendar_html.append(
                     f"<div class='more-events'>+{extra_event_count} more</div>"
@@ -619,81 +639,88 @@ def main() -> None:
 
     st.markdown(APP_THEME_CSS, unsafe_allow_html=True)
 
-    # 1. COMMAND CENTER (Hero + Input + Manual Escape Hatch)
-    st.markdown(
-        """
-        <header class="planner-hero">
-            <div class="hero-emoji">📅</div>
-            <h1>My School Planner</h1>
-            <p>Neon-powered planning for assignments, exams, projects, and after-school life.</p>
-        </header>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.text_input(
-        "Add a school event",
-        key="event_input",
-        placeholder="Try: 'Math Quiz next Friday at 10am' or 'Read Chapter 4 tonight'",
-        on_change=handle_event_submit,
-    )
-    
-    # --- NEW ESCAPE HATCH: The manual entry form ---
-    with st.expander("⚙️ Advanced Add (Manual Entry)", expanded=False):
-        with st.form("manual_add_form", clear_on_submit=True):
-            col_title, col_cat = st.columns([2, 1])
-            with col_title:
-                manual_title = st.text_input("Event Title", placeholder="e.g., Chemistry Lab")
-            with col_cat:
-                manual_category = st.selectbox("Category", ["Assignment", "Test", "Project", "Activity", "General"])
-                
-            col_date, col_time = st.columns(2)
-            with col_date:
-                manual_date = st.date_input("Date")
-            with col_time:
-                manual_time = st.time_input("Time (Optional)", value=None)
-                
-            submitted = st.form_submit_button("Save Event", type="primary", use_container_width=True)
-            
-            if submitted:
-                if not manual_title.strip():
-                    st.error("Please enter an event title.")
-                else:
-                    time_str = manual_time.strftime("%H:%M") if manual_time else None
-                    new_event = Event(
-                        title=manual_title.strip(),
-                        date=manual_date.isoformat(),
-                        time=time_str,
-                        category=manual_category
-                    )
-                    
-                    events_list = load_events()
-                    events_list.append(new_event)
-                    save_events(events_list)
-                    
-                    time_display = f" at **{time_str}**" if time_str else ""
-                    st.session_state.success_message = (
-                        f"✨ Saved manually: **{new_event.title}** for **{manual_date.strftime('%a, %b %d')}**"
-                        f"{time_display} under **[{new_event.category}]**."
-                    )
-                    st.rerun()
-    # -----------------------------------------------
-
-    if "success_message" in st.session_state:
-        st.success(st.session_state.pop("success_message"))
-    if "error_message" in st.session_state:
-        st.error(st.session_state.pop("error_message"))
-
     events = load_events()
     purge_expired_events()
     events = load_events()
 
-    # 2. QUICK STATS
-    render_quick_stats(events)
-    st.divider()
+    # ---------------------------------------------------------
+    # LAYOUT REDESIGN: Two-Column Split (Adjusted ratio)
+    # ---------------------------------------------------------
+    left_col, right_col = st.columns([1, 2.0], gap="large")
 
-    # 3. CALENDAR
-    render_calendar(events)
+    with left_col:
+        # 1. COMMAND CENTER (Hero + Input + Manual Escape Hatch)
+        st.markdown(
+            """
+            <header class="planner-hero">
+                <div class="hero-emoji">📅</div>
+                <h1>My School Planner</h1>
+                <p>Clean, warm-matte planning for assignments, exams, projects, and after-school life.</p>
+            </header>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.text_input(
+            "Add a school event",
+            key="event_input",
+            placeholder="Try: 'Math Quiz next Friday at 10am'",
+            on_change=handle_event_submit,
+        )
+        
+        # --- ESCAPE HATCH: The manual entry form ---
+        with st.expander("⚙️ Advanced Add (Manual Entry)", expanded=False):
+            with st.form("manual_add_form", clear_on_submit=True):
+                # Inputs are stacked vertically to fit the narrow left column perfectly
+                manual_title = st.text_input("Event Title", placeholder="e.g., Chemistry Lab")
+                manual_category = st.selectbox("Category", ["Assignment", "Test", "Project", "Activity", "General"])
+                
+                col_date, col_time = st.columns(2)
+                with col_date:
+                    manual_date = st.date_input("Date")
+                with col_time:
+                    manual_time = st.time_input("Time (Optional)", value=None)
+                    
+                submitted = st.form_submit_button("Save Event", type="primary", use_container_width=True)
+                
+                if submitted:
+                    if not manual_title.strip():
+                        st.error("Please enter an event title.")
+                    else:
+                        time_str = manual_time.strftime("%H:%M") if manual_time else None
+                        new_event = Event(
+                            title=manual_title.strip(),
+                            date=manual_date.isoformat(),
+                            time=time_str,
+                            category=manual_category
+                        )
+                        
+                        events_list = load_events()
+                        events_list.append(new_event)
+                        save_events(events_list)
+                        
+                        time_display = f" at **{time_str}**" if time_str else ""
+                        st.session_state.success_message = (
+                            f"✨ Saved manually: **{new_event.title}** for **{manual_date.strftime('%a, %b %d')}**"
+                            f"{time_display} under **[{new_event.category}]**."
+                        )
+                        st.rerun()
+        # -----------------------------------------------
+
+        if "success_message" in st.session_state:
+            st.success(st.session_state.pop("success_message"))
+        if "error_message" in st.session_state:
+            st.error(st.session_state.pop("error_message"))
+
+        st.divider()
+
+        # 2. QUICK STATS
+        render_quick_stats(events)
+
+    with right_col:
+        # 3. CALENDAR
+        render_calendar(events)
+
 
     # 4. PERSISTENT SIDEBAR
     with st.sidebar:
