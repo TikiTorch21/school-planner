@@ -1,13 +1,25 @@
 from __future__ import annotations
 
 import calendar
+import subprocess
+import sys
+import atexit
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from html import escape
 
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 
 from planner import Event, add_event, load_events, save_events, purge_expired_events
+
+
+@st.cache_resource
+def start_telegram_bot():
+    """Launch the Telegram bot as a background process exactly once."""
+    process = subprocess.Popen([sys.executable, "bot.py"])
+    atexit.register(process.terminate)
+    return process
 
 
 APP_THEME_CSS = """
@@ -44,6 +56,7 @@ html, body, [class*="css"] {
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, rgba(8, 12, 28, 0.96), rgba(13, 24, 46, 0.94));
     border-right: 1px solid var(--line);
+    padding-top: 2rem;
 }
 
 .block-container {
@@ -58,7 +71,7 @@ html, body, [class*="css"] {
         linear-gradient(135deg, rgba(53, 246, 255, 0.12), rgba(255, 79, 216, 0.1)),
         rgba(8, 12, 28, 0.72);
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.5rem;
     padding: 1.35rem 1.5rem;
     text-align: center;
 }
@@ -93,27 +106,42 @@ h2, h3 {
     color: var(--ink);
 }
 
-[data-testid="stTextInput"] label {
-    color: var(--ink);
-    font-weight: 700;
+/* --- THE GIANT "SEARCH ENGINE" INPUT --- */
+/* Target ONLY the main search bar so we don't break manual forms */
+div[data-testid="stTextInput"]:has(input[aria-label="Add a school event"]) {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
-[data-testid="stTextInput"] input {
-    background: rgba(8, 12, 28, 0.86);
-    border: 1px solid rgba(53, 246, 255, 0.35);
-    border-radius: 14px;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
-    color: var(--ink);
-    font-size: 1rem;
-    min-height: 3.1rem;
-    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+div[data-testid="stTextInput"]:has(input[aria-label="Add a school event"]) label {
+    display: none;
 }
 
-[data-testid="stTextInput"] input:focus {
-    border-color: var(--cyan);
-    box-shadow: 0 0 0 3px rgba(53, 246, 255, 0.18), 0 0 28px rgba(53, 246, 255, 0.22);
-    transform: translateY(-1px);
+input[aria-label="Add a school event"] {
+    background: rgba(10, 15, 32, 0.95);
+    border: 2px solid rgba(53, 246, 255, 0.4);
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(53, 246, 255, 0.1);
+    color: var(--ink);
+    font-size: 1.4rem;
+    line-height: 1.6;
+    padding: 1.2rem 1.5rem;
+    min-height: 5rem;
+    text-align: center;
+    transition: all 250ms ease;
 }
+
+input[aria-label="Add a school event"]:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 4px rgba(255, 79, 216, 0.15), 0 0 40px rgba(255, 79, 216, 0.35);
+    transform: translateY(-2px) scale(1.01);
+}
+
+input[aria-label="Add a school event"]::placeholder {
+    color: rgba(168, 179, 207, 0.5);
+    font-weight: 400;
+}
+/* --------------------------------------- */
 
 .stButton > button {
     background: linear-gradient(135deg, rgba(53, 246, 255, 0.18), rgba(255, 79, 216, 0.16));
@@ -140,6 +168,13 @@ details {
     box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
 }
 
+/* Dashboard Metric Tweaks */
+[data-testid="stMetric"] {
+    padding: 1rem 1.5rem;
+    text-align: center;
+    border-color: rgba(53, 246, 255, 0.2);
+}
+
 details {
     margin-bottom: 0.65rem;
     overflow: hidden;
@@ -159,7 +194,7 @@ details summary {
 
 .calendar-title {
     color: var(--ink);
-    margin: 0.25rem 0 0.85rem;
+    margin: 1.5rem 0 0.85rem;
     text-align: center;
     text-shadow: 0 0 18px rgba(53, 246, 255, 0.34);
 }
@@ -229,6 +264,7 @@ details summary {
     margin-bottom: 0.6rem;
 }
 
+/* SMART WRAPPING PILLS */
 .calendar-event {
     background: rgba(74, 168, 255, 0.16);
     border: 1px solid rgba(74, 168, 255, 0.2);
@@ -238,11 +274,9 @@ details summary {
     color: var(--ink);
     cursor: default;
     font-size: 0.82rem;
-    line-height: 1.2;
+    line-height: 1.35;
     margin-top: 0.4rem;
-    min-height: 2.5rem;
-    overflow: visible;
-    padding: 0.35rem 0.45rem;
+    padding: 0.45rem 0.55rem;
     position: relative;
     transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
     z-index: 1;
@@ -260,14 +294,16 @@ details summary {
     display: block;
     font-size: 0.72rem;
     font-weight: 800;
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.15rem;
 }
 
 .event-title {
-    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Allow up to 2 lines of text */
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal; /* Allow text wrapping */
+    word-wrap: break-word;
 }
 
 .event-tooltip {
@@ -319,30 +355,11 @@ details summary {
     margin-bottom: 0.35rem;
 }
 
-.calendar-event.homework {
-    background: rgba(74, 168, 255, 0.18);
-    border-left-color: var(--blue);
-}
-
-.calendar-event.exams {
-    background: rgba(255, 93, 115, 0.18);
-    border-left-color: var(--red);
-}
-
-.calendar-event.clubs {
-    background: rgba(105, 255, 151, 0.15);
-    border-left-color: var(--lime);
-}
-
-.calendar-event.projects {
-    background: rgba(168, 121, 255, 0.18);
-    border-left-color: var(--purple);
-}
-
-.calendar-event.general {
-    background: rgba(255, 230, 109, 0.14);
-    border-left-color: var(--yellow);
-}
+.calendar-event.homework { background: rgba(74, 168, 255, 0.18); border-left-color: var(--blue); }
+.calendar-event.exams { background: rgba(255, 93, 115, 0.18); border-left-color: var(--red); }
+.calendar-event.clubs { background: rgba(105, 255, 151, 0.15); border-left-color: var(--lime); }
+.calendar-event.projects { background: rgba(168, 121, 255, 0.18); border-left-color: var(--purple); }
+.calendar-event.general { background: rgba(255, 230, 109, 0.14); border-left-color: var(--yellow); }
 
 .more-events {
     color: var(--muted);
@@ -352,27 +369,12 @@ details summary {
 }
 
 @media (max-width: 760px) {
-    .block-container {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-    }
-    .planner-hero {
-        padding: 1rem;
-    }
-    .calendar-grid {
-        gap: 0.28rem;
-    }
-    .calendar-day {
-        min-height: 112px;
-        padding: 0.35rem;
-    }
-    .calendar-event {
-        font-size: 0.7rem;
-        min-height: 2.15rem;
-    }
-    .event-tooltip {
-        min-width: 190px;
-    }
+    .block-container { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .planner-hero { padding: 1rem; }
+    .calendar-grid { gap: 0.28rem; }
+    .calendar-day { min-height: 112px; padding: 0.35rem; }
+    .calendar-event { font-size: 0.7rem; }
+    .event-tooltip { min-width: 190px; }
 }
 </style>
 """
@@ -422,9 +424,9 @@ def format_event_date(event: Event) -> str:
     return date_text
 
 
-def format_event_time(event: Event) -> str:
+def format_event_time(event: Event, compact: bool = False) -> str:
     if not event.time:
-        return "All day"
+        return "" if compact else "All day"
     return datetime.strptime(event.time, "%H:%M").strftime("%I:%M %p").lstrip("0")
 
 
@@ -472,11 +474,14 @@ def handle_event_submit() -> None:
     except ValueError as error:
         st.session_state.error_message = str(error)
     else:
+        date_str = format_event_date(event)
+        time_str = format_event_time(event)
+        time_display = f" at **{time_str}**" if event.time else ""
         st.session_state.success_message = (
-            f"Added {event.title} for {format_event_date(event)}."
+            f"✨ Saved: **{event.title}** for **{date_str}**{time_display} "
+            f"under **[{event.category}]**."
         )
 
-    # Streamlit reruns automatically after callbacks, so avoid a second rerun here.
     st.session_state.event_input = ""
 
 
@@ -486,8 +491,27 @@ def render_event_card(event: Event, original_index: int) -> None:
         st.write(f"**Date:** {event.date}")
         st.write(f"**Time:** {format_event_time(event)}")
 
-        if st.button("Delete", key=f"delete-{original_index}", type="secondary"):
+        if st.button("Delete", key=f"delete-{original_index}", type="secondary", use_container_width=True):
             delete_event(original_index)
+
+
+def render_quick_stats(events: list[Event]) -> None:
+    today = date.today()
+    upcoming = upcoming_events(events)
+    due_this_week = events_due_this_week(events)
+    overdue = [event for event in events if date.fromisoformat(event.date) < today]
+
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Upcoming Events", len(upcoming))
+    with col2:
+        st.metric("Due This Week", len(due_this_week))
+    with col3:
+        if overdue:
+            st.error(f"⚠️ {len(overdue)} Overdue")
+        else:
+            st.metric("Overdue", "0")
 
 
 def render_calendar(events: list[Event]) -> None:
@@ -552,17 +576,21 @@ def render_calendar(events: list[Event]) -> None:
             for event in day_events[:5]:
                 category_class = category_css_class(event.category)
                 event_title = escape(event.title)
-                event_time = escape(format_event_time(event))
+                # Use compact=True to hide "All day" and save vertical space in the pills
+                event_time = escape(format_event_time(event, compact=True))
                 event_category = escape(event.category)
+                
+                time_html = f"<span class='event-time'>{event_time}</span>" if event_time else ""
+                
                 calendar_html.append(
                     "<div "
                     f"class='calendar-event {category_class}'"
                     ">"
-                    f"<span class='event-time'>{event_time}</span>"
+                    f"{time_html}"
                     f"<span class='event-title'>{event_title}</span>"
                     "<div class='event-tooltip' role='tooltip'>"
                     f"<div class='tooltip-title'>{event_title}</div>"
-                    f"<div><strong>Time:</strong> {event_time}</div>"
+                    f"<div><strong>Time:</strong> {escape(format_event_time(event))}</div>"
                     f"<div><strong>Category:</strong> {event_category}</div>"
                     "</div>"
                     "</div>"
@@ -580,34 +608,18 @@ def render_calendar(events: list[Event]) -> None:
     st.markdown("".join(calendar_html), unsafe_allow_html=True)
 
 
-def render_quick_stats(events: list[Event]) -> None:
-    today = date.today()
-    upcoming = upcoming_events(events)
-    due_this_week = events_due_this_week(events)
-    overdue = [
-        event for event in events if date.fromisoformat(event.date) < today
-    ]
-    assignments_due_this_week = [
-        event for event in due_this_week if event.category == "Assignment"
-    ]
-
-    st.subheader("Quick Stats")
-    st.metric("Upcoming Events", len(upcoming))
-    st.metric("Due This Week", len(due_this_week))
-    st.metric("Assignments This Week", len(assignments_due_this_week))
-
-    if overdue:
-        st.warning(f"{len(overdue)} overdue event(s)")
-
-    if events and st.button("Clear All", type="primary"):
-        clear_events()
-
-
 def main() -> None:
-    st.set_page_config(page_title="My Planner", page_icon="📅", layout="wide")
+    # Refresh the page automatically every 5000 milliseconds
+    st_autorefresh(interval=5000, limit=None, key="planner_autorefresh")
+
+    # Start the bot automatically in the background
+    start_telegram_bot()
+    
+    st.set_page_config(page_title="My Planner", page_icon="📅", layout="wide", initial_sidebar_state="expanded")
 
     st.markdown(APP_THEME_CSS, unsafe_allow_html=True)
 
+    # 1. COMMAND CENTER (Hero + Input + Manual Escape Hatch)
     st.markdown(
         """
         <header class="planner-hero">
@@ -622,9 +634,50 @@ def main() -> None:
     st.text_input(
         "Add a school event",
         key="event_input",
-        placeholder="History essay due next Tuesday at 3pm",
+        placeholder="Try: 'Math Quiz next Friday at 10am' or 'Read Chapter 4 tonight'",
         on_change=handle_event_submit,
     )
+    
+    # --- NEW ESCAPE HATCH: The manual entry form ---
+    with st.expander("⚙️ Advanced Add (Manual Entry)", expanded=False):
+        with st.form("manual_add_form", clear_on_submit=True):
+            col_title, col_cat = st.columns([2, 1])
+            with col_title:
+                manual_title = st.text_input("Event Title", placeholder="e.g., Chemistry Lab")
+            with col_cat:
+                manual_category = st.selectbox("Category", ["Assignment", "Test", "Project", "Activity", "General"])
+                
+            col_date, col_time = st.columns(2)
+            with col_date:
+                manual_date = st.date_input("Date")
+            with col_time:
+                manual_time = st.time_input("Time (Optional)", value=None)
+                
+            submitted = st.form_submit_button("Save Event", type="primary", use_container_width=True)
+            
+            if submitted:
+                if not manual_title.strip():
+                    st.error("Please enter an event title.")
+                else:
+                    time_str = manual_time.strftime("%H:%M") if manual_time else None
+                    new_event = Event(
+                        title=manual_title.strip(),
+                        date=manual_date.isoformat(),
+                        time=time_str,
+                        category=manual_category
+                    )
+                    
+                    events_list = load_events()
+                    events_list.append(new_event)
+                    save_events(events_list)
+                    
+                    time_display = f" at **{time_str}**" if time_str else ""
+                    st.session_state.success_message = (
+                        f"✨ Saved manually: **{new_event.title}** for **{manual_date.strftime('%a, %b %d')}**"
+                        f"{time_display} under **[{new_event.category}]**."
+                    )
+                    st.rerun()
+    # -----------------------------------------------
 
     if "success_message" in st.session_state:
         st.success(st.session_state.pop("success_message"))
@@ -635,17 +688,20 @@ def main() -> None:
     purge_expired_events()
     events = load_events()
 
-    st.subheader("Calendar")
+    # 2. QUICK STATS
+    render_quick_stats(events)
+    st.divider()
+
+    # 3. CALENDAR
     render_calendar(events)
 
-    left_column, right_column = st.columns([2, 1], gap="large")
-
-    with left_column:
-        st.subheader("Upcoming Events")
+    # 4. PERSISTENT SIDEBAR
+    with st.sidebar:
+        st.markdown("### 📋 Upcoming Events")
         upcoming = upcoming_events(events)
 
         if not upcoming:
-            st.info("No upcoming events yet.")
+            st.info("No upcoming events yet. You're all caught up!")
         else:
             today = date.today()
             indexed_events = list(enumerate(events))
@@ -657,9 +713,10 @@ def main() -> None:
                 if date.fromisoformat(event.date) < today:
                     continue
                 render_event_card(event, original_index)
-
-    with right_column:
-        render_quick_stats(events)
+                
+        st.divider()
+        if events and st.button("🗑️ Clear All Events", type="primary", use_container_width=True):
+            clear_events()
 
 
 if __name__ == "__main__":

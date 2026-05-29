@@ -5,5 +5,9 @@ description = "A simple natural-language school planner."
 requires-python = ">=3.11"
 dependencies = [
     "dateparser>=1.2.0",
+    "python-dotenv>=1.2.2",
+    "python-telegram-bot[job-queue]>=22.7",
     "streamlit>=1.35.0",
+    "streamlit-autorefresh>=1.0.1",
+    "tzdata>=2026.2",
 ]

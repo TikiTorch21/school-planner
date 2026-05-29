@@ -1,22 +1,26 @@
-# 📅 School Planner
+# 📅 My School Planner
 
-A clean, interactive school planner built with Python. This app uses Natural Language Processing to make adding assignments as easy as typing a sentence.
+A high-end, interactive school planner built with Python and Streamlit. This app combines a sleek, cyberpunk-inspired desktop dashboard with an automated Telegram bot, allowing you to manage your schedule seamlessly from your computer or your phone.
 
 ## 🚀 Features
-- **NL Input:** Add events like "Math Quiz Friday at 10am."
-- **Interactive Calendar:** View all your tasks in a beautiful, stretched calendar layout.
-- **Auto-Cleanup:** Old events are automatically removed to keep your schedule fresh.
-- **Hover Details:** Hover over any event to see full details instantly.
+- **Natural Language Parsing:** Add events effortlessly. Just type "Math Quiz Friday at 10am" and the app figures out the date, time, and category.
+- **Telegram Bot Integration:** Text your planner on the go! Send a message from your phone, and it instantly syncs to your desktop dashboard.
+- **Automated Daily Reminders:** The bot proactively sends a push notification to your phone at 5:30 PM EST with tomorrow's schedule.
+- **Advanced Dashboard UI:** Features a neon-styled persistent sidebar, smart-wrapping calendar pills, and a real-time quick stats HUD.
+- **Auto-Sync & Cleanup:** Old events are automatically purged, and the dashboard silently refreshes in the background so you never have to hit "reload".
+- **Manual Escape Hatch:** A built-in advanced form for highly specific scheduling needs.
 
 ## 🛠️ Tech Stack
 - **Language:** [Python](https://www.python.org/)
-- **Environment:** [uv](https://github.com/astral-sh/uv)
-- **Frontend:** [Streamlit](https://streamlit.io/)
-- **Parsing:** `dateparser`
+- **Environment & Packaging:** [uv](https://github.com/astral-sh/uv)
+- **Frontend UI:** [Streamlit](https://streamlit.io/)
+- **NLP & Parsing:** `dateparser`
+- **Bot Engine & Scheduling:** `python-telegram-bot[job-queue]`
+- **Background Refresh:** `streamlit-autorefresh`
 
-## 📦 Installation & Usage
-1. Make sure you have `uv` installed.
-2. Clone this repo: `git clone https://github.com/[YOUR_USERNAME]/school-planner.git`
-3. Install dependencies and run:
+## 📦 Installation & Setup
+
+1. **Clone the repository:**
    ```bash
-   uv run streamlit run app.py
+   git clone [https://github.com/](https://github.com/)[YOUR_USERNAME]/school-planner.git
+   cd school-planner
