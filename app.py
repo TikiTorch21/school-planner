@@ -22,6 +22,15 @@ def start_telegram_bot():
     return process
 
 
+CATEGORY_ICONS = {
+    "Test": "🚨",
+    "Assignment": "📝",
+    "Project": "🛠️",
+    "Activity": "🏆",
+    "General": "📌",
+}
+
+
 APP_THEME_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap');
@@ -202,7 +211,7 @@ details summary {
 
 .calendar-shell {
     width: 100%;
-    margin: 0.25rem 0 1.5rem;
+    margin: 0.25rem 0 1.2rem;
     overflow: visible;
 }
 
@@ -225,7 +234,6 @@ details summary {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 10px;
-    /* REDUCED HEIGHT VERY SLIGHTLY */
     min-height: clamp(100px, 11vh, 150px); 
     padding: 0.5rem;
     overflow: visible;
@@ -343,6 +351,31 @@ details summary {
     visibility: visible;
 }
 
+/* Fix tooltips clipping off the left/right edges of the calendar */
+.calendar-grid > .calendar-day:nth-child(7n+1) .event-tooltip {
+    left: 0;
+    transform: translate(0, -0.25rem);
+}
+.calendar-grid > .calendar-day:nth-child(7n+1) .calendar-event:hover .event-tooltip {
+    transform: translate(0, 0);
+}
+.calendar-grid > .calendar-day:nth-child(7n+1) .event-tooltip::before {
+    left: 1.2rem;
+}
+
+.calendar-grid > .calendar-day:nth-child(7n) .event-tooltip {
+    left: auto;
+    right: 0;
+    transform: translate(0, -0.25rem);
+}
+.calendar-grid > .calendar-day:nth-child(7n) .calendar-event:hover .event-tooltip {
+    transform: translate(0, 0);
+}
+.calendar-grid > .calendar-day:nth-child(7n) .event-tooltip::before {
+    left: auto;
+    right: 1.2rem;
+}
+
 .tooltip-title {
     color: var(--warm-accent);
     font-size: 0.9rem;
@@ -386,6 +419,34 @@ details summary {
     font-size: 0.72rem;
     font-weight: 600;
     margin-top: 0.3rem;
+}
+
+/* Color Legend Bar */
+.category-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    padding: 0.6rem 1rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    color: var(--warm5);
+}
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+}
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    display: inline-block;
 }
 
 @media (max-width: 760px) {
@@ -494,11 +555,10 @@ def handle_event_submit() -> None:
     except ValueError as error:
         st.session_state.error_message = str(error)
     else:
+        icon = CATEGORY_ICONS.get(event.category, "📌")
         date_str = format_event_date(event)
-        time_str = format_event_time(event)
-        time_display = f" at **{time_str}**" if event.time else ""
         st.session_state.success_message = (
-            f"✨ Saved: **{event.title}** for **{date_str}**{time_display} "
+            f"✨ Saved: {icon} **{event.title}** for **{date_str}** "
             f"under **[{event.category}]**."
         )
 
@@ -506,12 +566,21 @@ def handle_event_submit() -> None:
 
 
 def render_event_card(event: Event, original_index: int) -> None:
-    with st.expander(f"{event.title} - {format_event_date(event)}"):
-        st.write(f"**Category:** {event.category}")
-        st.write(f"**Date:** {event.date}")
-        st.write(f"**Time:** {format_event_time(event)}")
+    icon = CATEGORY_ICONS.get(event.category, "📌")
+    days_left = (date.fromisoformat(event.date) - date.today()).days
+    if days_left == 0:
+        relative_tag = "Today"
+    elif days_left == 1:
+        relative_tag = "Tomorrow"
+    elif days_left > 1:
+        relative_tag = f"in {days_left} days"
+    else:
+        relative_tag = f"{abs(days_left)}d overdue"
 
-        if st.button("Delete", key=f"delete-{original_index}", type="secondary", use_container_width=True):
+    with st.expander(f"{icon} **{event.title}** — {format_event_date(event)}"):
+        st.caption(f"🏷️ **{event.category}** • ⏳ Due **{relative_tag}** ({format_event_time(event)})")
+
+        if st.button("✅ Complete / Delete", key=f"delete-{original_index}", type="secondary", use_container_width=True):
             delete_event(original_index)
 
 
@@ -596,9 +665,9 @@ def render_calendar(events: list[Event]) -> None:
             for event in day_events[:4]: # Show max 4 events per day in smaller boxes
                 category_class = category_css_class(event.category)
                 event_title = escape(event.title)
-                # Use compact=True to hide "All day" and save vertical space in the pills
                 event_time = escape(format_event_time(event, compact=True))
                 event_category = escape(event.category)
+                icon = CATEGORY_ICONS.get(event.category, "📌")
                 
                 time_html = f"<span class='event-time'>{event_time}</span>" if event_time else ""
                 
@@ -609,7 +678,7 @@ def render_calendar(events: list[Event]) -> None:
                     f"{time_html}"
                     f"<span class='event-title'>{event_title}</span>"
                     "<div class='event-tooltip' role='tooltip'>"
-                    f"<div class='tooltip-title'>{event_title}</div>"
+                    f"<div class='tooltip-title'>{icon} {event_title}</div>"
                     f"<div><strong>Time:</strong> {escape(format_event_time(event))}</div>"
                     f"<div><strong>Category:</strong> {event_category}</div>"
                     "</div>"
@@ -626,6 +695,20 @@ def render_calendar(events: list[Event]) -> None:
 
     calendar_html.append("</div></div>")
     st.markdown("".join(calendar_html), unsafe_allow_html=True)
+
+    # Category Color Legend Bar
+    st.markdown(
+        """
+        <div class="category-legend">
+            <span class="legend-item"><span class="legend-dot" style="background: var(--warm-ex);"></span>🚨 Test</span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--warm-hw);"></span>📝 Assignment</span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--warm-pr);"></span>🛠️ Project</span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--warm-cl);"></span>🏆 Activity</span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--warm-gn);"></span>📌 General</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def main() -> None:
@@ -671,7 +754,6 @@ def main() -> None:
         # --- ESCAPE HATCH: The manual entry form ---
         with st.expander("⚙️ Advanced Add (Manual Entry)", expanded=False):
             with st.form("manual_add_form", clear_on_submit=True):
-                # Inputs are stacked vertically to fit the narrow left column perfectly
                 manual_title = st.text_input("Event Title", placeholder="e.g., Chemistry Lab")
                 manual_category = st.selectbox("Category", ["Assignment", "Test", "Project", "Activity", "General"])
                 
@@ -699,9 +781,10 @@ def main() -> None:
                         events_list.append(new_event)
                         save_events(events_list)
                         
-                        time_display = f" at **{time_str}**" if time_str else ""
+                        icon = CATEGORY_ICONS.get(new_event.category, "📌")
+                        time_display = f" at **{format_event_time(new_event)}**" if time_str else ""
                         st.session_state.success_message = (
-                            f"✨ Saved manually: **{new_event.title}** for **{manual_date.strftime('%a, %b %d')}**"
+                            f"✨ Saved manually: {icon} **{new_event.title}** for **{manual_date.strftime('%a, %b %d')}**"
                             f"{time_display} under **[{new_event.category}]**."
                         )
                         st.rerun()
